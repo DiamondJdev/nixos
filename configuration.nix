@@ -151,7 +151,16 @@ in
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  programs.starship.enable = true;
+  programs.starship = {
+    enable = true;
+    settings = {
+      directory = {
+        style = "blue bold";
+        truncation_length = 3;
+        truncate_to_repo = true;
+      };
+    };
+  };
 
   programs.zsh = {
     enable = true;
@@ -160,6 +169,5 @@ in
       rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
       status = "git status";
     };
-    shellInit = "echo \"hello world\""
   };
 }
