@@ -261,5 +261,8 @@ in
       rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
       status = "git status";
     };
+    interactiveShellInit = ''
+      fastfetch
+    '';
   };
 }
