@@ -111,6 +111,7 @@
       claude-code
       fastfetch
       alacritty
+      starship
     ];
   };
 
