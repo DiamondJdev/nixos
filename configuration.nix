@@ -136,6 +136,7 @@ in
   environment.systemPackages = with pkgs; [
     git
     wget
+    nil
     nixd
   ];
 
