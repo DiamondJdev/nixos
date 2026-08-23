@@ -3,7 +3,16 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { inputs, pkgs, ... }:
-
+let
+  shellConfig = {
+    enable = true;
+    shellAliases = {
+      la = "ls -a";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+      status = "git status";
+    };
+  };
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -152,12 +161,6 @@
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      la = "ls -a";
-      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-      status = "git status";
-    };
-  };
+  programs.zsh = shellConfig;
+  programs.bash = shellConfig;
 }
