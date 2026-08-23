@@ -4,14 +4,7 @@
 
 { inputs, pkgs, ... }:
 let
-  shellConfig = {
-    enable = true;
-    shellAliases = {
-      la = "ls -a";
-      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-      status = "git status";
-    };
-  };
+
 in
 {
   imports = [
@@ -159,5 +152,13 @@ in
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  programs.zsh = shellConfig;
+  programs.zsh = {
+    enable = true;
+    shellAliases = {
+      la = "ls -a";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+      status = "git status";
+    };
+    interactiveShellInit = "eval \"$(starship init zsh)\"";
+  };
 }
