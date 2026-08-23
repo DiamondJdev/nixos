@@ -110,7 +110,6 @@
       obsidian
       claude-code
       fastfetch
-      raycast
     ];
   };
 
