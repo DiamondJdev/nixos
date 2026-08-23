@@ -93,15 +93,15 @@
       "wheel"
     ];
     packages = with pkgs; [
-      kdePackages.kate
       zed-editor
       inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-      #  thunderbird
+      obsidian
+      claude-code
+      fastfetch
     ];
   };
 
-  # Install firefox.
-  programs.firefox.enable = true;
+  programs.steam.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -114,16 +114,6 @@
     nil
     nixd
   ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh = {
@@ -153,7 +143,6 @@
   # Bluetooth Configuration
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
-
   services.blueman.enable = true;
 
   programs.bash = {
