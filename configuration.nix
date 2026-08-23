@@ -5,10 +5,10 @@
 { inputs, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -18,8 +18,11 @@
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
- 
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -85,7 +88,10 @@
   users.users."diamondjdev" = {
     isNormalUser = true;
     description = "Cameron";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
       kdePackages.kate
       zed-editor
@@ -125,7 +131,7 @@
     settings = {
       X11Forwarding = true;
       PermitRootLogin = "no";
-      PasswordAuthentication = true; 
+      PasswordAuthentication = true;
     };
     openFirewall = true;
   };
@@ -148,12 +154,12 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
-  services.blueman.enable = true;  
+  services.blueman.enable = true;
 
   programs.bash = {
     shellAliases = {
       la = "ls -a";
-      rebuild = "sudo nixos-rebuild switch --flake";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
       status = "git status";
     };
   };
