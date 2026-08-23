@@ -83,9 +83,6 @@ in
     variant = "";
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = false;
-
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -162,5 +159,4 @@ in
   services.blueman.enable = true;
 
   programs.zsh = shellConfig;
-  programs.bash = shellConfig;
 }
