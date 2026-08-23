@@ -14,7 +14,7 @@
         modules = [
           ./configuration.nix
           ./hardware-configuration.nix
-          ./modules/ssh.nix
+          # ./modules/ssh.nix # Commented as to disable for now
           ./modules/swap.nix
         ];
       };
