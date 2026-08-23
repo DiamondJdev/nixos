@@ -130,7 +130,7 @@ in
     wget
     nil
     nixd
-    nerd-fonts
+    nerd-fonts.fira-code
   ];
 
   # Open ports in the firewall.
