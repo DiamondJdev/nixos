@@ -100,6 +100,7 @@
   users.users."diamondjdev" = {
     isNormalUser = true;
     description = "Cameron";
+    shell = pkgs.zsh;
     extraGroups = [
       "networkmanager"
       "wheel"
@@ -151,7 +152,8 @@
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
-  programs.bash = {
+  programs.zsh = {
+    enable = true;
     shellAliases = {
       la = "ls -a";
       rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
