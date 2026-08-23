@@ -111,7 +111,6 @@ in
       claude-code
       fastfetch
       alacritty
-      starship
     ];
   };
 
@@ -152,6 +151,8 @@ in
   hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
+  programs.starship.enable = true;
+
   programs.zsh = {
     enable = true;
     shellAliases = {
@@ -159,6 +160,5 @@ in
       rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
       status = "git status";
     };
-    interactiveShellInit = "eval \"$(starship init zsh)\"";
   };
 }
