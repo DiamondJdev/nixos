@@ -110,6 +110,7 @@
       obsidian
       claude-code
       fastfetch
+      alacritty
     ];
   };
 
