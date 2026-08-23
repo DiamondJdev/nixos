@@ -160,5 +160,6 @@ in
       rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
       status = "git status";
     };
+    shellInit = "echo \"hello world\""
   };
 }
