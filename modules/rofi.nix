@@ -8,7 +8,7 @@
   programs = {
     rofi = {
       enable = true;
-      package = pkgs.rofi-rofi-wayland;
+      package = pkgs.rofi-wayland;
       extraConfig = {
 
       };
