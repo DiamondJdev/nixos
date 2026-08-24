@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     zen-browser.url = "github:youwen5/zen-browser-flake";
+    hyprland.url = "github:hyprwm/Hyprland";
   };
 
   outputs =
