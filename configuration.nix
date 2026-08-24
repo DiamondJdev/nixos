@@ -102,6 +102,7 @@
       "wheel"
     ];
     packages = with pkgs; [
+      btop-rocm
       zed-editor
       inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
       obsidian
@@ -117,8 +118,11 @@
     enable32Bit = true;
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # Configure Nix Pkgs
+  nixpkgs.config = {
+    allowUnfree = true;
+    rocmSupport = true;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
