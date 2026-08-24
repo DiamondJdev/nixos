@@ -18,6 +18,7 @@
           ./modules/ssh.nix # Simply comment to disable
           ./modules/swap.nix
           ./modules/shell.nix
+          ./modules/hypr.nix
         ];
       };
     };
