@@ -127,7 +127,7 @@
 
   # Enable OLLAMA with ROCm support
   services.ollama = {
-    enable = true;
+    enable = false;
     package = pkgs.ollama-rocm;
     # loadModels = [
     # "llama3.2"
@@ -150,8 +150,6 @@
     nil
     nixd
     nerd-fonts.fira-code
-    clinfo # Test ROCm
-    # ollama-rocm
   ];
 
   # Open ports in the firewall.
