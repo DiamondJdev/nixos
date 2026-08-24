@@ -117,6 +117,7 @@
     enable = true;
     enable32Bit = true;
   };
+  hardware.amdgpu.opencl.enable = true;
 
   # Configure Nix Pkgs
   nixpkgs.config = {
@@ -132,6 +133,7 @@
     nil
     nixd
     nerd-fonts.fira-code
+    clinfo # Test ROCm
   ];
 
   # Open ports in the firewall.
