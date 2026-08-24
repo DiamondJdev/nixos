@@ -19,6 +19,7 @@
           ./modules/swap.nix
           ./modules/shell.nix
           ./modules/hypr.nix
+          ./modules/rofi.nix
         ];
       };
     };

@@ -157,6 +157,7 @@
     nil
     nixd
     nerd-fonts.fira-code
+    # Hyprland Requirements
     kitty
     rofi
   ];
