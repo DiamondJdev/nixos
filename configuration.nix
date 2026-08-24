@@ -113,11 +113,26 @@
   };
 
   programs.steam.enable = true;
+  hardware.amdgpu = {
+    opencl.enable = true;
+    amdvlk.enable = true;
+  };
+  services.xserver.videoDrivers = [ "amdgpu" ];
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
   };
-  hardware.amdgpu.opencl.enable = true;
+
+  # Enable OLLAMA with ROCm support
+  services.ollama = {
+    enable = true;
+    package = pkgs.ollama-ollama-rocm;
+    # loadModels = [
+    # "llama3.2"
+    # "codellama"
+    # ];
+    # rocmOverrideGfx = "10.3.0";
+  };
 
   # Configure Nix Pkgs
   nixpkgs.config = {
@@ -134,6 +149,7 @@
     nixd
     nerd-fonts.fira-code
     clinfo # Test ROCm
+    # ollama-rocm
   ];
 
   # Open ports in the firewall.
