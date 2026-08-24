@@ -113,14 +113,16 @@
   };
 
   programs.steam.enable = true;
-  hardware.amdgpu = {
-    opencl.enable = true;
-    amdvlk.enable = true;
-  };
-  services.xserver.videoDrivers = [ "amdgpu" ];
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
+
+  # Configure GPU
+  hardware = {
+    graphics = {
+      enable = true;
+      enable32Bit = true;
+    };
+    amdgpu = {
+      opencl.enable = true;
+    };
   };
 
   # Enable OLLAMA with ROCm support
