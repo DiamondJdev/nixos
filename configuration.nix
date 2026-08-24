@@ -158,6 +158,7 @@
     nixd
     nerd-fonts.fira-code
     kitty
+    rofi
   ];
 
   # Open ports in the firewall.
