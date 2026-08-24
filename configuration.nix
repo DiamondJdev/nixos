@@ -128,7 +128,7 @@
   # Enable OLLAMA with ROCm support
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-ollama-rocm;
+    package = pkgs.ollama-rocm;
     # loadModels = [
     # "llama3.2"
     # "codellama"
