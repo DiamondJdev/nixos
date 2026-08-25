@@ -77,6 +77,17 @@
     enable = true;
     autoEnable = true;
 
+    fonts = {
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Sans";
+      };
+
+      monospace = {
+        package = pkgs.nerd-fonts.jetbrains-mono;
+        name = "JetBrainsMono Nerd Font";
+      };
+    };
     image = ./rice/imgs/TF2.jpg;
 
     polarity = "dark";
@@ -154,6 +165,9 @@
     kitty
     rofi
     papirus-icon-theme
+  ];
+  fonts.packages = with pkgs; [
+    font-awesome_4
   ];
 
   system.stateVersion = "26.05"; # Don't change this

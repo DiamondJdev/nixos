@@ -4,6 +4,7 @@
     ./home/shell.nix
     ./home/notifs.nix
     ./home/rofi.nix
+    ./home/waybar.nix
   ];
   home.stateVersion = "26.05";
 
