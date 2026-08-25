@@ -26,7 +26,7 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               extraSpecialArgs = { inherit inputs; };
-              users.diamondjdev = ./home-manager/home.nix;
+              users.diamondjdev = ./home.nix;
             };
           }
           ./modules/ssh.nix # Simply comment to disable

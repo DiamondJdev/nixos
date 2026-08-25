@@ -6,7 +6,7 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
-  # Bootloader.
+  # Bootloader for version select
   boot.loader.systemd-boot = {
     enable = true;
     configurationLimit = 15;
