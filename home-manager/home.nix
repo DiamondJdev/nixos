@@ -10,14 +10,14 @@
     alacritty
   ];
 
-  # programs.git = {
-  #   enable = true;
+  programs.git = {
+    enable = true;
 
-  #   settings = {
-  #     user.name = "diamondjdev";
-  #     user.email = "diamondjdev@gmail.com";
-  #   };
-  # };
+    settings = {
+      user.name = "diamondjdev";
+      user.email = "diamondjdev@gmail.com";
+    };
+  };
 
   programs.zsh = {
     enable = true;
