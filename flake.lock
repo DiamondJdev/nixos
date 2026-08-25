@@ -561,22 +561,6 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1785386831,
-        "narHash": "sha256-sPS3CaXH8RAT3FZRuy4VcV47iuYIWMMfa0GbyJKC3o4=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "21ea275a7c46aef9d4d6ddc962e6d562e9d94183",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-26.05",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_4": {
-      "locked": {
         "lastModified": 1787070829,
         "narHash": "sha256-vXNVDVtvfiQuXthP0NHPFdNvvMTkGpx0UP8oddIWbNk=",
         "owner": "nixos",
@@ -656,7 +640,9 @@
         "firefox-gnome-theme": "firefox-gnome-theme",
         "flake-parts": "flake-parts",
         "gnome-shell": "gnome-shell",
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "nur": "nur",
         "systems": "systems_2",
         "tinted-kitty": "tinted-kitty",
@@ -816,7 +802,7 @@
     },
     "zen-browser": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
         "lastModified": 1787200418,
