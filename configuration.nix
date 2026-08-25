@@ -73,6 +73,15 @@
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
 
+  stylix = {
+    enable = true;
+    autoEnable = true;
+
+    image = ./rice/imgs/TF2.jpg;
+
+    polarity = "dark";
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";

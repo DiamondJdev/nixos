@@ -9,6 +9,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprland.url = "github:hyprwm/Hyprland";
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -16,6 +20,7 @@
       nixpkgs,
       home-manager,
       hyprland,
+      stylix,
       ...
     }@inputs:
     {
@@ -34,6 +39,7 @@
               users.diamondjdev = ./home.nix;
             };
           }
+          stylix.nixosModules.stylix
           ./modules/ssh.nix # Simply comment to disable
           ./modules/swap.nix
           # ./modules/hypr.nix
