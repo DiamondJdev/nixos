@@ -26,15 +26,15 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               extraSpecialArgs = { inherit inputs; };
-              users.diamondjdev = ./home-manager/home.nix;
+              # users.diamondjdev = ./home-manager/home.nix;
             };
           }
           ./modules/ssh.nix # Simply comment to disable
           ./modules/swap.nix
           ./modules/shell.nix
-          ./modules/hypr.nix
-          ./modules/rofi.nix
-          ./modules/dunst.nix
+          # ./modules/hypr.nix
+          # ./modules/rofi.nix
+          # ./modules/dunst.nix
         ];
       };
     };
