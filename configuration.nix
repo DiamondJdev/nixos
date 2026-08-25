@@ -159,7 +159,8 @@
     nerd-fonts.fira-code
     # Hyprland Requirements
     kitty
-    rofi
+    rofi-wayland
+    papirus-icon-theme
   ];
 
   # Open ports in the firewall.

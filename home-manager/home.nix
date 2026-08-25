@@ -1,0 +1,141 @@
+{ config, pkgs, ... }:
+{
+  home.stateVersion = "24.11";
+
+  home.packages = with pkgs; [
+    btop-rocm
+    fastfetch
+    zed-editor
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    obsidian
+    claude-code
+    alacritty
+  ];
+
+  programs.git = {
+    enable = true;
+
+    settings = {
+      user.name = "diamondjdev";
+      user.email = "diamondjdev@gmail.com";
+    };
+  };
+
+  programs.zsh = {
+    enable = true;
+
+    # autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      la = "ls -a";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+      status = "git status";
+    };
+    interactiveShellInit = ''
+      fastfetch
+    '';
+  };
+
+  programs.starship = {
+    enable = true;
+    settings = {
+      "$schema" = "https://starship.rs/config-schema.json";
+
+      format = ''
+        [░▒▓](#a3aed2)$os[](bg:#769ff0 fg:#a3aed2)$directory[](fg:#769ff0 bg:#394260)$git_branch$git_status[](fg:#394260 bg:#212736)$nodejs$bun$rust$golang$php[](fg:#212736 bg:#1d2230)$time[ ](fg:#1d2230)
+        $character'';
+
+      directory = {
+        style = "fg:#e3e5e5 bg:#769ff0";
+        format = "[ $path ]($style)";
+        truncation_length = 3;
+        truncation_symbol = "…/";
+        substitutions = {
+          "Documents" = "󰈙 ";
+          "Downloads" = " ";
+          "Music" = " ";
+          "Pictures" = " ";
+        };
+      };
+
+      git_branch = {
+        symbol = "";
+        style = "bg:#394260";
+        format = "[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)";
+      };
+
+      git_status = {
+        style = "bg:#394260";
+        format = "[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)";
+      };
+
+      nodejs = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      bun = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      rust = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      golang = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      php = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      time = {
+        disabled = false;
+        time_format = "%R";
+        style = "bg:#1d2230";
+        format = "[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)";
+      };
+
+      os = {
+        style = "bg:#a3aed2 fg:#090c0c";
+        format = "[ $symbol ]($style)";
+        disabled = false;
+        symbols = {
+          Windows = "󰍲";
+          Ubuntu = "󰕈";
+          SUSE = "";
+          Raspbian = "󰐿";
+          Mint = "󰣭";
+          Macos = "󰀵";
+          Manjaro = "";
+          Linux = "󰌽";
+          Gentoo = "󰣨";
+          Fedora = "󰣛";
+          Alpine = "";
+          Amazon = "";
+          Android = "";
+          AOSC = "";
+          Arch = "󰣇";
+          Artix = "󰣇";
+          EndeavourOS = "";
+          CentOS = "";
+          Debian = "󰣚";
+          Redhat = "󱄛";
+          RedHatEnterprise = "󱄛";
+          Pop = "";
+        };
+      };
+    };
+  };
+}
