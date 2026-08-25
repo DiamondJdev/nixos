@@ -154,8 +154,12 @@
   environment.systemPackages = with pkgs; [
     git
     wget
+    # Nix Language Servers
     nil
     nixd
+    # Visibility Tools
+    btop-rocm
+    fastfetch
     nerd-fonts.fira-code
     # Hyprland Requirements
     kitty

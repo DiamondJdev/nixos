@@ -3,8 +3,6 @@
   home.stateVersion = "24.11";
 
   home.packages = with pkgs; [
-    btop-rocm
-    fastfetch
     zed-editor
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     obsidian
