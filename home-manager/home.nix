@@ -2,7 +2,7 @@
 {
   imports = [
     ./home/shell.nix
-    ./home/git.nix
+    # ./home/git.nix
     # ./home/hyprland.nix
     # ./home/programs.nix
   ];
