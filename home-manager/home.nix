@@ -19,21 +19,21 @@
   #   };
   # };
 
-  # programs.zsh = {
-  #   enable = true;
+  programs.zsh = {
+    enable = true;
 
-  #   # autosuggestions.enable = true;
-  #   syntaxHighlighting.enable = true;
+    # autosuggestions.enable = true;
+    # syntaxHighlighting.enable = true;
 
-  #   shellAliases = {
-  #     la = "ls -a";
-  #     rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-  #     status = "git status";
-  #   };
-  #   interactiveShellInit = ''
-  #     fastfetch
-  #   '';
-  # };
+    shellAliases = {
+      la = "ls -a";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+      status = "git status";
+    };
+    interactiveShellInit = ''
+      fastfetch
+    '';
+  };
 
   # programs.starship = {
   #   enable = true;

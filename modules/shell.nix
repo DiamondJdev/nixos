@@ -102,15 +102,15 @@
     };
   };
 
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      la = "ls -a";
-      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-      status = "git status";
-    };
-    interactiveShellInit = ''
-      fastfetch
-    '';
-  };
+  # programs.zsh = {
+  #   enable = true;
+  #   shellAliases = {
+  #     la = "ls -a";
+  #     rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+  #     status = "git status";
+  #   };
+  #   interactiveShellInit = ''
+  #     fastfetch
+  #   '';
+  # };
 }
