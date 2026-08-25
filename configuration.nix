@@ -99,6 +99,7 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  programs.zsh.enable = true; # Satisfy NixOS requirement, despite being managed in @home-manager/home.nix
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."diamondjdev" = {
     isNormalUser = true;
