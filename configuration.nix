@@ -159,7 +159,7 @@
     nerd-fonts.fira-code
     # Hyprland Requirements
     kitty
-    rofi-wayland
+    rofi
     papirus-icon-theme
   ];
 
