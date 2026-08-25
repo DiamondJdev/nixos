@@ -1,5 +1,11 @@
 { inputs, pkgs, ... }:
 {
+  imports = [
+    ./home/shell.nix
+    ./home/git.nix
+    # ./home/hyprland.nix
+    # ./home/programs.nix
+  ];
   home.stateVersion = "24.11";
 
   home.packages = with pkgs; [
@@ -19,20 +25,20 @@
     };
   };
 
-  programs.zsh = {
-    enable = true;
+  # programs.zsh = {
+  #   enable = true;
 
-    syntaxHighlighting.enable = true;
+  #   syntaxHighlighting.enable = true;
 
-    shellAliases = {
-      la = "ls -a";
-      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-      status = "git status";
-    };
-    initContent = ''
-      fastfetch
-    '';
-  };
+  #   shellAliases = {
+  #     la = "ls -a";
+  #     rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+  #     status = "git status";
+  #   };
+  #   initContent = ''
+  #     fastfetch
+  #   '';
+  # };
 
   # programs.starship = {
   #   enable = true;

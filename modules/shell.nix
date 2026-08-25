@@ -1,5 +1,21 @@
+# Home Manager Complient shell config
 { ... }:
 {
+  programs.zsh = {
+    enable = true;
+
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      la = "ls -a";
+      rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
+      status = "git status";
+    };
+    initContent = ''
+      fastfetch
+    '';
+  };
+
   programs.starship = {
     enable = true;
     settings = {
@@ -101,16 +117,4 @@
       };
     };
   };
-
-  # programs.zsh = {
-  #   enable = true;
-  #   shellAliases = {
-  #     la = "ls -a";
-  #     rebuild = "nixos-rebuild switch --flake ~/nixos#nixos --sudo";
-  #     status = "git status";
-  #   };
-  #   interactiveShellInit = ''
-  #     fastfetch
-  #   '';
-  # };
 }
