@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }:
 {
   imports = [
-    ./home/shell.nix
+    ./shell.nix
     # ./home/git.nix
     # ./home/hyprland.nix
     # ./home/programs.nix
