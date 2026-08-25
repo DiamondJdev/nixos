@@ -21,6 +21,7 @@
           ./modules/shell.nix
           ./modules/hypr.nix
           ./modules/rofi.nix
+          ./modules/dunst.nix
         ];
       };
     };
