@@ -108,15 +108,15 @@
       "networkmanager"
       "wheel"
     ];
-    packages = with pkgs; [
-      btop-rocm
-      fastfetch
-      zed-editor
-      inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
-      obsidian
-      claude-code
-      alacritty
-    ];
+    # packages = with pkgs; [
+    #   btop-rocm
+    #   fastfetch
+    #   zed-editor
+    #   inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    #   obsidian
+    #   claude-code
+    #   alacritty
+    # ];
   };
 
   programs.steam.enable = true;
