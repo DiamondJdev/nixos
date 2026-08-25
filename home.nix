@@ -2,11 +2,10 @@
 {
   imports = [
     ./home/shell.nix
-    # ./home/git.nix
-    # ./home/hyprland.nix
-    # ./home/programs.nix
+    ./home/notifs.nix
+    ./home/rofi.nix
   ];
-  home.stateVersion = "24.11";
+  home.stateVersion = "26.05";
 
   home.packages = with pkgs; [
     zed-editor
