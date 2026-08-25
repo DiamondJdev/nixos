@@ -11,7 +11,6 @@
         corner_radius = 10;
         transparency = 10;
         frame_width = 1;
-        font = "JetBrains Mono 10";
       };
       urgency_normal = {
         timeout = 10;
