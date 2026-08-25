@@ -8,10 +8,8 @@
   programs = {
     rofi = {
       enable = true;
-      package = pkgs.rofi-wayland;
-      extraConfig = {
-
-      };
+      package = pkgs.rofi;
+      # extraConfig = {};
     };
   };
 }
