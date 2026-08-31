@@ -2,7 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  config,
+  ...
+}:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -40,6 +45,29 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Tailscale VPN Configuration
+  services.tailscale = {
+    enable = true;
+    # Tailscale service starts at boot, but requires manual auth
+    # After rebuild, run: sudo tailscale up
+    openFirewall = true; # Allow Tailscale traffic through firewall
+  };
+
+  # Open Tailscale UDP port for peer-to-peer communication
+  networking.firewall.allowedUDPPorts = [ 41641 ];
+
+  # The onboard NIC is a Realtek RTL8125 2.5GbE controller. The in-kernel
+  # r8169 driver has a long-documented link-flap bug on this chip: the
+  # link drops and renegotiates (often downshifting to 100Mbps) every
+  # 60-90s, which was the actual cause of SteamVR's "Host Machine
+  # stopped responding" (error 450) disconnects — confirmed via dmesg
+  # timestamps lining up exactly with the SteamVR log's socket-bind
+  # failures. Realtek's own out-of-tree r8125 driver doesn't have this
+  # bug; blacklist r8169 so it binds instead.
+  boot.blacklistedKernelModules = [ "r8169" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ];
+  boot.kernelModules = [ "r8125" ];
+
   # Set your time zone.
   time.timeZone = "America/Chicago";
 
@@ -71,6 +99,14 @@
     # make sure to also set the portal package, so that they are in sync
     portalPackage =
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  };
+
+  xdg.portal = {
+    enable = true;
+
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+    ];
   };
 
   stylix = {
@@ -124,7 +160,11 @@
     ];
   };
 
-  programs.steam.enable = true;
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
 
   # Configure GPU
   hardware = {
@@ -135,6 +175,7 @@
     amdgpu = {
       opencl.enable = true;
     };
+    xpadneo.enable = true; # Xbox wireless/Bluetooth controller support
   };
 
   # Enable OLLAMA with ROCm support
@@ -165,7 +206,20 @@
     kitty
     rofi
     papirus-icon-theme
+    wl-clipboard
+    hyprpolkitagent
+    # Gaming
+    heroic
+    # Settings app (replaces KDE systemsettings under Hyprland — its
+    # Network/Bluetooth/Sound/Power panels talk to real, independent
+    # daemons (NetworkManager/BlueZ/PipeWire) so those work standalone.
+    # Its Mouse & Touchpad and some Display panels write to GNOME's own
+    # config store, which Hyprland never reads — those panels will look
+    # normal but silently do nothing; keep using hyprland.lua for mouse
+    # sensitivity and monitor config instead.
+    gnome-control-center
   ];
+
   fonts.packages = with pkgs; [
     font-awesome_4
   ];
