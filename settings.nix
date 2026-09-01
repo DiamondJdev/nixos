@@ -153,7 +153,7 @@ rec {
   # module drops any entry whose .desktop file is missing at build time, so
   # an uninstalled app degrades to "absent" instead of a broken tile.
   dockPins = [
-    "zen-beta"
+    "zen"
     "org.kde.dolphin"
     "Alacritty"
     "code"

@@ -9,19 +9,21 @@
     ./desktop/swaync
     ./desktop/wlogout
     ./desktop/hyprlock.nix
+    ./desktop/dock
+    ./desktop/screenshots.nix
     ./desktop/hyprshell.nix
 
     ./programs/shell.nix
+    ./programs/alacritty.nix
+    ./programs/editors.nix
   ];
 
   home.stateVersion = "26.05";
 
   home.packages = with pkgs; [
-    zed-editor
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     obsidian
     claude-code
-    alacritty
     jq
     socat
     gh
