@@ -270,8 +270,18 @@ in
 
         echo "load test: $DEV -> $SINK (via $GW_MAC) for ''${DURATION}s"
         ip neigh replace "$SINK" lladdr "$GW_MAC" dev "$DEV" nud permanent
+        # `kill %1` would NOT work here: job control is off in
+        # non-interactive shells, so the job spec never resolves and the
+        # blaster would survive this script exiting — flooding the network
+        # indefinitely. The PID is captured explicitly instead, and the
+        # children are killed before the subshell, since killing the
+        # subshell alone orphans dd and socat.
+        blaster=""
         cleanup() {
-          kill %1 2>/dev/null || true
+          if [ -n "$blaster" ]; then
+            pkill -TERM -P "$blaster" 2>/dev/null || true
+            kill -TERM "$blaster" 2>/dev/null || true
+          fi
           ip neigh del "$SINK" dev "$DEV" 2>/dev/null || true
         }
         trap cleanup EXIT INT TERM
@@ -283,12 +293,15 @@ in
         # 1400-byte payloads stay under the 1500-byte MTU, so nothing is
         # fragmented and the NIC sees a realistic packet rate rather than a
         # small number of huge segments.
+        # `timeout` is the real safety net: even if this script is killed
+        # with SIGKILL and the trap never runs, socat still exits on its own
+        # and dd dies of SIGPIPE. Nothing can outlive the test window.
         ( dd if=/dev/zero bs=1400 status=none \
-            | socat -u -b1400 - UDP-DATAGRAM:"$SINK":9999 ) &
+            | timeout "$(( DURATION + 5 ))" \
+                socat -u -b1400 - UDP-DATAGRAM:"$SINK":9999 ) &
+        blaster=$!
 
-        for _ in $(seq 1 "$DURATION"); do
-          sleep 1
-        done
+        sleep "$DURATION"
 
         cleanup
         sleep 1
