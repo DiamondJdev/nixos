@@ -10,6 +10,7 @@
     ../../modules/nixos/peripherals.nix
     ../../modules/nixos/fonts.nix
     ../../modules/nixos/theming.nix
+    ../../modules/nixos/login.nix
     ../../modules/nixos/ssh.nix
     ../../modules/nixos/swap.nix
   ];

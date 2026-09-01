@@ -11,6 +11,7 @@
     ./desktop/hyprlock.nix
     ./desktop/dock
     ./desktop/screenshots.nix
+    ./desktop/gaming.nix
     ./desktop/hyprshell.nix
 
     ./programs/shell.nix
