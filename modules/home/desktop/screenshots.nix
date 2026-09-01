@@ -19,7 +19,9 @@ let
       wl-clipboard
       libnotify
       coreutils
-      hyprland # for hyprctl, used to pick the focused output
+      # NOTE: hyprland is deliberately NOT listed. pkgs.hyprland is nixpkgs'
+      # 0.55.4, and adding it would pull a second Hyprland in beside the
+      # flake's 0.56.0 (plan §6). hyprctl is on PATH inside the session.
     ];
     text = ''
       # Cancelling a selection must be silent. slurp exits non-zero when the

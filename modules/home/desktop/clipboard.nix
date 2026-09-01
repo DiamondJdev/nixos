@@ -14,6 +14,7 @@ let
       rofi
       wl-clipboard
       gnused
+      libnotify
     ];
     text = ''
       # cliphist's list format is "<id>\t<preview>". Rofi is told to display
