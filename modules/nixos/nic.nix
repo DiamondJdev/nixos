@@ -216,5 +216,97 @@ in
       done
     '';
   };
-  environment.systemPackages = [ pkgs.ethtool ];
+
+  ## Load generation ########################################################
+  # The flapping correlates with sustained transmit, not with elapsed time:
+  # the link was clean for 50 minutes while idle, then flapped continuously
+  # during a period when 78GB went out of this interface. Reproducing it
+  # therefore needs sustained TX, and specifically LAN-rate TX — a WAN speed
+  # test is capped by the ISP uplink and will not get close.
+  #
+  # `nic-loadtest` generates that load with no second machine required. It
+  # sends UDP to an unused address on the local subnet, with a static
+  # neighbour entry pointing at the router's MAC so the frames leave this
+  # host at line rate and are dropped by the router rather than being
+  # broadcast to every device on the network. That containment is the point:
+  # a broadcast flood would disrupt the VR headset and everything else on the
+  # LAN, which is exactly what we do not want while testing.
+  #
+  # Usage:  sudo nic-loadtest [seconds]     (default 180)
+  # Watch:  journalctl -t nic-flap -b -f
+  environment.systemPackages = [
+    pkgs.ethtool
+    pkgs.iperf3 # for the two-machine test, which is the higher-fidelity one
+    (pkgs.writeShellApplication {
+      name = "nic-loadtest";
+      runtimeInputs = with pkgs; [
+        iproute2
+        socat
+        coreutils
+        procps
+      ];
+      text = ''
+        set -uo pipefail
+
+        DEV=${interface}
+        DURATION="''${1:-180}"
+
+        if [ "$(id -u)" -ne 0 ]; then
+          echo "must run as root (needs 'ip neigh' to install the static entry)" >&2
+          exit 1
+        fi
+
+        GW=$(ip route | awk '/^default/{print $3; exit}')
+        GW_MAC=$(ip neigh show "$GW" | awk '{print $5; exit}')
+        if [ -z "''${GW_MAC:-}" ]; then
+          echo "could not resolve the gateway MAC; is $GW reachable?" >&2
+          exit 1
+        fi
+
+        # An address on-subnet that nothing owns. Frames are addressed to the
+        # router at layer 2, so the switch forwards them on exactly one port
+        # and the router discards them at layer 3.
+        SINK="''${SINK_IP:-192.168.0.254}"
+
+        echo "load test: $DEV -> $SINK (via $GW_MAC) for ''${DURATION}s"
+        ip neigh replace "$SINK" lladdr "$GW_MAC" dev "$DEV" nud permanent
+        cleanup() {
+          kill %1 2>/dev/null || true
+          ip neigh del "$SINK" dev "$DEV" 2>/dev/null || true
+        }
+        trap cleanup EXIT INT TERM
+
+        before=$(cat "/sys/class/net/$DEV/carrier_changes")
+        txBefore=$(cat "/sys/class/net/$DEV/statistics/tx_bytes")
+        echo "carrier_changes before: $before"
+
+        # 1400-byte payloads stay under the 1500-byte MTU, so nothing is
+        # fragmented and the NIC sees a realistic packet rate rather than a
+        # small number of huge segments.
+        ( dd if=/dev/zero bs=1400 status=none \
+            | socat -u -b1400 - UDP-DATAGRAM:"$SINK":9999 ) &
+
+        for _ in $(seq 1 "$DURATION"); do
+          sleep 1
+        done
+
+        cleanup
+        sleep 1
+
+        after=$(cat "/sys/class/net/$DEV/carrier_changes")
+        txAfter=$(cat "/sys/class/net/$DEV/statistics/tx_bytes")
+        rate=$(( (txAfter - txBefore) * 8 / DURATION / 1000000 ))
+
+        echo
+        echo "=== result ==="
+        echo "sustained tx : ''${rate} Mbit/s"
+        echo "carrier changes: $before -> $after  (delta $(( after - before )))"
+        if [ "$after" -ne "$before" ]; then
+          echo "FLAPPED UNDER LOAD — see: journalctl -t nic-flap -b"
+        else
+          echo "no flaps during ''${DURATION}s at ''${rate} Mbit/s"
+        fi
+      '';
+    })
+  ];
 }
