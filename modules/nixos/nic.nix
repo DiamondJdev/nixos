@@ -72,10 +72,29 @@ let
 
   # Log the conditions at each carrier change. Diagnostic only.
   logFlaps = true;
+
+  # Disable the wifi radio entirely. This machine is wired, and wlp9s0 was
+  # dual-homed on the same 192.168.0.0/24 subnet as enp8s0, which bought
+  # nothing and cost a great deal: a reassociation loop every ~5m20s all boot
+  # (deauth reason 6, a roam between two mesh APs that never succeeded), and
+  # Tailscale repeatedly flip-flopping its default route between the two
+  # interfaces as a result.
+  #
+  # Blacklisting the bus driver rather than just telling NetworkManager to
+  # ignore the interface is deliberate: it powers the radio down instead of
+  # leaving it associated, which also removes it as an RF and PCIe variable
+  # while the ethernet fault is still open. Flip to false and rebuild to
+  # bring wifi back.
+  disableWifi = true;
 in
 {
   ## Driver selection #######################################################
-  boot.blacklistedKernelModules = lib.optional useOutOfTreeDriver "r8169";
+  boot.blacklistedKernelModules =
+    lib.optional useOutOfTreeDriver "r8169"
+    # rtw89_8922ae is the PCI bus driver for this card; blacklisting it stops
+    # the device binding at all. The shared rtw89_core/rtw89_pci modules are
+    # left alone since nothing else loads them once this one is gone.
+    ++ lib.optional disableWifi "rtw89_8922ae";
   boot.extraModulePackages = lib.optional useOutOfTreeDriver config.boot.kernelPackages.r8125;
   boot.kernelModules = lib.optional useOutOfTreeDriver "r8125";
 
@@ -177,7 +196,9 @@ in
           speed=$(cat "$dev/speed" 2>/dev/null || echo '?')
           carrier=$(cat "$dev/carrier" 2>/dev/null || echo '?')
 
-          # Wifi context: associated BSSID, or "down".
+          # Wifi context: associated BSSID, "down", or "absent" once the
+          # radio is blacklisted. Kept in the log line so that if wifi is
+          # ever re-enabled the correlation can be re-checked.
           wifi=down
           if [ -e /sys/class/net/wlp9s0/operstate ] &&
              [ "$(cat /sys/class/net/wlp9s0/operstate)" = "up" ]; then
