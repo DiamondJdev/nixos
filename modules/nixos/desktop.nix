@@ -64,6 +64,14 @@ in
   # on for the agent to have anything to talk to.
   security.polkit.enable = true;
 
+  # Plan §24: without a PAM service named "hyprlock", hyprlock cannot
+  # authenticate at all — it fails every password. fprintAuth is disabled
+  # because there is no fingerprint reader on this machine and leaving it on
+  # makes PAM wait on a device that never answers.
+  security.pam.services.hyprlock = {
+    text = "auth include login";
+  };
+
   ## Qt + file manager without Plasma ######################################
   # Plan §31: Dolphin stays, but only the KDE pieces it genuinely needs are
   # installed — not the whole desktop. Without plasma-workspace, Dolphin

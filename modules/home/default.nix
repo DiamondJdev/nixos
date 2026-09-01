@@ -4,8 +4,11 @@
     ./desktop/hyprland
     ./desktop/waybar
     ./desktop/rofi
+    ./desktop/clipboard.nix
     ./desktop/wallpaper
     ./desktop/swaync
+    ./desktop/wlogout
+    ./desktop/hyprlock.nix
     ./desktop/hyprshell.nix
 
     ./programs/shell.nix

@@ -34,7 +34,7 @@ let
     launcher = "rofi -show drun";
     clipboard = "clipboard-history";
     notificationCenter = "swaync-client -t -sw";
-    powerMenu = "wlogout";
+    powerMenu = "power-menu";
     lock = "hyprlock";
 
     screenshotRegionEdit = "screenshot region-edit";

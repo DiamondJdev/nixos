@@ -200,7 +200,7 @@ in
       "custom/power" = {
         format = "⏻";
         tooltip = false;
-        on-click = "wlogout";
+        on-click = "power-menu";
       };
     };
 
