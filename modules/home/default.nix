@@ -5,7 +5,7 @@
     ./desktop/waybar
     ./desktop/rofi
     ./desktop/wallpaper
-    ./desktop/notifications.nix
+    ./desktop/swaync
     ./desktop/hyprshell.nix
 
     ./programs/shell.nix
