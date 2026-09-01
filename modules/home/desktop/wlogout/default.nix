@@ -9,17 +9,33 @@
   ...
 }:
 let
-  # wlogout ships good icon artwork, but the SVGs carry no `fill`, so they
-  # render black — invisible against a dark overlay. SVG children inherit
-  # `fill` from an ancestor, so injecting it on the root <svg> element
-  # recolours the whole set without touching the paths.
+  # wlogout ships good icon artwork, but two things must be fixed before GTK
+  # will draw any of it:
+  #
+  #  1. The SVGs carry no `fill`, so their paths default to black and are
+  #     invisible against the dark overlay. Children inherit `fill` from an
+  #     ancestor, so injecting it on the root <svg> recolours the whole set.
+  #
+  #  2. They must not remain SVGs. GTK decodes CSS background-image through
+  #     gdk-pixbuf, and SVG support there requires the librsvg loader to be
+  #     registered via GDK_PIXBUF_MODULE_FILE. nixpkgs' wlogout is a bare,
+  #     unwrapped ELF with no such wrapper, so an SVG background silently
+  #     renders as nothing — which is why even the stock icons never
+  #     appeared. Rasterising to PNG at build time sidesteps the loader
+  #     entirely, since gdk-pixbuf decodes PNG natively with no module to
+  #     locate at runtime.
   icons = pkgs.runCommand "wlogout-icons-themed" { } ''
     mkdir -p "$out"
     for svg in ${pkgs.wlogout}/share/wlogout/assets/*.svg; do
-      name=$(basename "$svg")
+      name=$(basename "$svg" .svg)
       ${pkgs.gnused}/bin/sed \
         's|<svg |<svg fill="${rice.withHash rice.palette.text}" |' \
-        "$svg" > "$out/$name"
+        "$svg" > recoloured.svg
+      ${pkgs.librsvg}/bin/rsvg-convert \
+        --width 128 --height 128 --keep-aspect-ratio \
+        --format png \
+        --output "$out/$name.png" \
+        recoloured.svg
     done
   '';
 

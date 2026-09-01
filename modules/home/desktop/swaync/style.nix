@@ -140,8 +140,9 @@ in
     border-radius: ${toString radius.control}px;
     margin: 3px;
     padding: 10px;
-    font-family: "${fonts.mono.name}";
-    font-size: ${toString (fonts.sizes.notification + 4)}px;
+    font-family: "${fonts.ui.name}";
+    font-size: ${toString fonts.sizes.notification}px;
+    font-weight: 500;
     transition: background 150ms ease-out, color 150ms ease-out;
   }
 
@@ -160,12 +161,15 @@ in
     color: ${c "text"};
   }
 
+  /* These labels are text ("Volume", "Mic"), not glyphs, so they take the
+     UI font at normal size rather than the oversized monospace treatment. */
   .widget-volume > box > label,
   .widget-slider > label {
     color: ${rice.withHash accent};
-    font-family: "${fonts.mono.name}";
-    font-size: ${toString (fonts.sizes.notification + 3)}px;
-    margin-right: 8px;
+    font-family: "${fonts.ui.name}";
+    font-size: ${toString fonts.sizes.notification}px;
+    font-weight: 600;
+    margin-right: 10px;
   }
 
   trough {
@@ -231,6 +235,28 @@ in
   .widget-mpris > box > button:hover {
     background: rgba(203, 166, 247, 0.2);
     color: ${c "text"};
+  }
+
+  /* ---- Scrollbars ---------------------------------------------------- */
+  /* The control centre scrolls, but the scrollbar itself should never be
+     visible — it cuts across the rounded panel edge and breaks the surface.
+     Both the widget and its trough are hidden so no gutter is reserved. */
+  scrollbar,
+  scrollbar trough,
+  scrollbar slider,
+  .control-center scrollbar,
+  .control-center-list scrollbar {
+    opacity: 0;
+    min-width: 0px;
+    min-height: 0px;
+    background: transparent;
+    border: none;
+    -gtk-icon-source: none;
+  }
+
+  scrolledwindow undershoot,
+  scrolledwindow overshoot {
+    background: none;
   }
 
   /* ---- Do not disturb ---------------------------------------------- */

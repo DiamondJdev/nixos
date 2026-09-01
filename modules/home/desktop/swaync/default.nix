@@ -102,39 +102,39 @@ in
         "buttons-grid" = {
           actions = [
             {
-              label = "󰖩";
+              label = "Wi-Fi";
               command = "${toggleWifi}";
             }
             {
-              label = "";
+              label = "Bluetooth";
               command = "${toggleBluetooth}";
             }
             {
-              label = "󰍬";
+              label = "Mic";
               command = "${toggleMicMute}";
             }
             {
-              label = "󰕾";
+              label = "Audio";
               command = "${pkgs.pavucontrol}/bin/pavucontrol";
             }
             {
-              label = "";
+              label = "Devices";
               command = "${pkgs.blueman}/bin/blueman-manager";
             }
             {
-              label = "";
+              label = "Lock";
               command = "hyprlock";
             }
           ];
-          buttons-per-row = 6;
+          buttons-per-row = 3;
         };
 
         volume = {
-          label = "󰕾";
+          label = "Volume";
           show-per-app = true;
           show-per-app-icon = true;
-          expand-button-label = "";
-          collapse-button-label = "";
+          expand-button-label = "More";
+          collapse-button-label = "Less";
         };
 
         # Microphone. SwayNC's `volume` widget only drives the default sink,
@@ -142,7 +142,7 @@ in
         # straight to wpctl. wpctl reports volume as "Volume: 0.55", hence
         # the awk field.
         "slider#mic" = {
-          label = "󰍬";
+          label = "Mic";
           min = 0;
           max = 1;
           cmd_getter = "${pkgs.wireplumber}/bin/wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | ${pkgs.gawk}/bin/awk '{print $2}'";

@@ -79,9 +79,9 @@ in
         class = "^$";
         title = "^$";
         xwayland = true;
-        floating = true;
+        float = true;
         fullscreen = false;
-        pinned = false;
+        pin = false;
       };
       no_focus = true;
     }

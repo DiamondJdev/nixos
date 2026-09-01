@@ -60,11 +60,11 @@ in
     background-color: rgba(203, 166, 247, 0.3);
   }
 
-  #lock     { background-image: url("${icons}/lock.svg"); }
-  #logout   { background-image: url("${icons}/logout.svg"); }
-  #suspend  { background-image: url("${icons}/suspend.svg"); }
-  #reboot   { background-image: url("${icons}/reboot.svg"); }
-  #shutdown { background-image: url("${icons}/shutdown.svg"); }
+  #lock     { background-image: url("${icons}/lock.png"); }
+  #logout   { background-image: url("${icons}/logout.png"); }
+  #suspend  { background-image: url("${icons}/suspend.png"); }
+  #reboot   { background-image: url("${icons}/reboot.png"); }
+  #shutdown { background-image: url("${icons}/shutdown.png"); }
 
   /* Destructive actions pick up the warning accent on focus, so shutdown and
      reboot are visually distinct from the reversible ones. */

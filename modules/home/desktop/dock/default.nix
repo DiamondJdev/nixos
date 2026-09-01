@@ -70,6 +70,20 @@ in
     inherit rice;
   };
 
+  # The auto-hide hotspot is a separate GTK layer surface that sizes itself
+  # to its content. Left alone it comes out 4x3 PIXELS at the bottom centre,
+  # which is effectively impossible to hit — the dock appeared never to work.
+  # nwg-dock looks for an optional hotspot.css, and a min-height there grows
+  # the surface. Measured with `hyprctl layers`: 4x3 without this file,
+  # 236x22 with it.
+  xdg.configFile."nwg-dock-hyprland/hotspot.css".text = ''
+    window {
+      min-width: 700px;
+      min-height: 16px;
+      background: transparent;
+    }
+  '';
+
   systemd.user.services.nwg-dock = {
     Unit = {
       Description = "nwg-dock-hyprland application dock";
@@ -89,8 +103,11 @@ in
         "40" # icon size
         "-mb"
         "8" # lift it clear of the screen edge
+        # 0 = reveal as soon as the pointer enters the hotspot. With a
+        # non-zero value the pointer also has to be moving slowly enough,
+        # which combined with a thin hotspot makes the dock feel broken.
         "-hd"
-        "150" # hotspot dwell before revealing, in ms
+        "0"
         "-l"
         "overlay"
         "-nolauncher" # Rofi is the launcher (§21); a second one is clutter

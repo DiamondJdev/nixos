@@ -103,13 +103,13 @@ in
       ## System ###########################################################
       "cpu" = {
         interval = 3;
-        format = "  {usage}%";
+        format = "  CPU {usage}%";
         tooltip = true;
         on-click = "alacritty -e btop";
       };
       "memory" = {
         interval = 5;
-        format = "  {percentage}%";
+        format = "  RAM {percentage}%";
         tooltip-format = "{used:0.1f} GiB / {total:0.1f} GiB";
         on-click = "alacritty -e btop";
       };
