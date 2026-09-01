@@ -18,6 +18,7 @@
     alacritty
     jq
     socat
+    gh
     # gnome-control-center hardcodes a check refusing to launch outside
     # GNOME/Unity — this scopes XDG_CURRENT_DESKTOP=GNOME to just this
     # one process so it starts, without touching the session-wide
