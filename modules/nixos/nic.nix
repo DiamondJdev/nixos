@@ -69,6 +69,9 @@ let
   disableEEE = true;
 
   interface = "enp8s0";
+
+  # Log the conditions at each carrier change. Diagnostic only.
+  logFlaps = true;
 in
 {
   ## Driver selection #######################################################
@@ -115,5 +118,82 @@ in
     '';
   };
 
+
+  ## Flap diagnostics #######################################################
+  # Every hypothesis so far has died on the same problem: the flaps cannot be
+  # reproduced on demand, and by the time they are noticed the conditions
+  # that produced them are gone. Two candidate causes were each plausible and
+  # each turned out to be unfalsifiable after the fact:
+  #
+  #   - "it flaps under load"  — the link was stable for 50 min while idle at
+  #     2.5G, then flapped continuously later, but there is no historical
+  #     record of the throughput at either time.
+  #   - "the wifi is involved" — wlp9s0 reassociates every ~5m20s all boot
+  #     long (deauth reason 6, CLASS2_FRAME_FROM_NONAUTH), which is a real
+  #     fault in its own right, but it was cycling during the quiet ethernet
+  #     period too, so it does not correlate 1:1.
+  #
+  # So instead of guessing again, this records the conditions AT the moment
+  # of each carrier change. One line per flap in the journal, with the
+  # throughput over the preceding interval, the negotiated speed, and the
+  # wifi state — enough to settle load-correlation and wifi-correlation from
+  # a single subsequent occurrence.
+  #
+  #   journalctl -t nic-flap -b
+  #
+  # Set to false once the cause is found; it is a diagnostic, not a feature.
+  systemd.services.nic-flap-log = lib.mkIf logFlaps {
+    description = "Log ${interface} carrier changes with context";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-pre.target" ];
+    serviceConfig = {
+      Type = "simple";
+      Restart = "always";
+      RestartSec = 5;
+      SyslogIdentifier = "nic-flap";
+    };
+    script = ''
+      dev=/sys/class/net/${interface}
+      [ -e "$dev" ] || exit 0
+
+      last=$(cat "$dev/carrier_changes")
+      lastTx=$(cat "$dev/statistics/tx_bytes")
+      lastRx=$(cat "$dev/statistics/rx_bytes")
+      lastT=$(date +%s)
+
+      echo "watching ${interface}: baseline $last carrier changes"
+
+      while true; do
+        sleep 2
+        now=$(cat "$dev/carrier_changes" 2>/dev/null) || continue
+        tx=$(cat "$dev/statistics/tx_bytes")
+        rx=$(cat "$dev/statistics/rx_bytes")
+        t=$(date +%s)
+
+        if [ "$now" != "$last" ]; then
+          secs=$(( t - lastT )); [ "$secs" -gt 0 ] || secs=1
+          txbps=$(( (tx - lastTx) * 8 / secs / 1000000 ))
+          rxbps=$(( (rx - lastRx) * 8 / secs / 1000000 ))
+          speed=$(cat "$dev/speed" 2>/dev/null || echo '?')
+          carrier=$(cat "$dev/carrier" 2>/dev/null || echo '?')
+
+          # Wifi context: associated BSSID, or "down".
+          wifi=down
+          if [ -e /sys/class/net/wlp9s0/operstate ] &&
+             [ "$(cat /sys/class/net/wlp9s0/operstate)" = "up" ]; then
+            wifi=$(${pkgs.iw}/bin/iw dev wlp9s0 link 2>/dev/null \
+                     | ${pkgs.gnugrep}/bin/grep -oE 'Connected to [0-9a-f:]+' \
+                     | ${pkgs.gnused}/bin/sed 's/Connected to //') || wifi=up
+            [ -n "$wifi" ] || wifi=up
+          fi
+
+          echo "FLAP $last->$now carrier=$carrier speed=''${speed}Mb/s tx=''${txbps}Mbit/s rx=''${rxbps}Mbit/s wifi=$wifi"
+          last=$now
+        fi
+
+        lastTx=$tx; lastRx=$rx; lastT=$t
+      done
+    '';
+  };
   environment.systemPackages = [ pkgs.ethtool ];
 }
