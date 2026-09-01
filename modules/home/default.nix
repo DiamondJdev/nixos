@@ -1,13 +1,16 @@
 { inputs, pkgs, ... }:
 {
   imports = [
-    ./home/shell.nix
-    ./home/notifs.nix
-    ./home/rofi.nix
-    ./home/waybar.nix
-    ./home/wallpaper.nix
-    ./home/hyprshell.nix
+    ./desktop/hyprland
+    ./desktop/waybar
+    ./desktop/rofi
+    ./desktop/wallpaper
+    ./desktop/notifications.nix
+    ./desktop/hyprshell.nix
+
+    ./programs/shell.nix
   ];
+
   home.stateVersion = "26.05";
 
   home.packages = with pkgs; [
@@ -19,11 +22,18 @@
     jq
     socat
     gh
+
     # gnome-control-center hardcodes a check refusing to launch outside
     # GNOME/Unity — this scopes XDG_CURRENT_DESKTOP=GNOME to just this
     # one process so it starts, without touching the session-wide
-    # XDG_CURRENT_DESKTOP set in hyprland.lua (which stays "Hyprland:KDE"
-    # for the portal-selection and KDE-KCM reasons documented there).
+    # XDG_CURRENT_DESKTOP, which is now plain "Hyprland".
+    #
+    # Its Network/Bluetooth/Sound/Power panels talk to real, independent
+    # daemons (NetworkManager/BlueZ/PipeWire) so those work standalone.
+    # Its Mouse & Touchpad and some Display panels write to GNOME's own
+    # config store, which Hyprland never reads — those panels will look
+    # normal but silently do nothing; mouse sensitivity and monitor config
+    # live in modules/home/desktop/hyprland instead.
     (writeShellScriptBin "settings" ''
       exec env XDG_CURRENT_DESKTOP=GNOME ${gnome-control-center}/bin/gnome-control-center "$@"
     '')
@@ -31,10 +41,11 @@
 
   programs.git = {
     enable = true;
-
     settings = {
       user.name = "diamondjdev";
       user.email = "diamondjdev@gmail.com";
     };
   };
+
+  programs.home-manager.enable = true;
 }
