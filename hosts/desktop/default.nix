@@ -62,8 +62,6 @@
     openFirewall = true;
   };
 
-  # Expose the BT assistant webapp on this node's own tailscale IP so any
-  # device in the tailnet can reach it at <tailscale-ip>:8080.
   systemd.services.tailscale-serve = {
     description = "Tailscale Serve for BT Assistant";
     after = [ "tailscaled.service" ];
@@ -72,7 +70,7 @@
 
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg --tcp 8080 localhost:8080";
+      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg http://127.0.0.1:8080";
       RemainAfterExit = true;
       Restart = "on-failure";
       RestartSec = "10s";
