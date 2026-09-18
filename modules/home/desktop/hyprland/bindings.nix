@@ -138,7 +138,7 @@ in
   # See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/
   device = {
     name = "razer-razer-basilisk-ultimate-dongle";
-    sensitivity = -0.5;
+    sensitivity = -0.7;
     accel_profile = "flat";
   };
 
