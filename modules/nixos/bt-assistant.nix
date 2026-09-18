@@ -47,6 +47,13 @@ in
 
       environment = {
         UV_CACHE_DIR = "/var/cache/bt-assistant";
+        # Expose numpy, onnxruntime and friends to systemd
+        LD_LIBRARY_PATH = lib.makeLibraryPath [
+          pkgs.stdenv.cc.cc.lib
+          pkgs.zlib
+          pkgs.portaudio
+          pkgs.libsndfile
+        ];
       };
 
       serviceConfig = {
