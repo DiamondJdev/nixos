@@ -17,7 +17,7 @@
   ];
 
   # App code: ~/Projects/bt-assistant
-  services.bt-assistant.enable = false;
+  services.bt-assistant.enable = true;
 
   networking.hostName = "nixos";
 
