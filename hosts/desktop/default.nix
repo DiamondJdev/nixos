@@ -70,7 +70,13 @@
 
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg http://127.0.0.1:8080";
+      # 443 -> stable bt-assistant systemd service (8080).
+      # 8081 -> ad-hoc dev instance you start by hand
+      ExecStart = "${pkgs.writeShellScript "bt-tailscale-serve" ''
+        set -e
+        ${config.services.tailscale.package}/bin/tailscale serve --bg http://127.0.0.1:8080
+        ${config.services.tailscale.package}/bin/tailscale serve --bg --https=8081 http://127.0.0.1:8081
+      ''}";
       RemainAfterExit = true;
       Restart = "on-failure";
       RestartSec = "10s";
