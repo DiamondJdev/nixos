@@ -19,10 +19,14 @@
     enable = true;
 
     profiles.default = {
-      # Stylix themes VS Code's colours; these settings cover what it does
-      # not, and deliberately stop there. Plan §35: do not force extensions
-      # unrelated to appearance or the existing workflow.
+      # Stylix themes VS Code's colours by default; workbench.colorTheme
+      # below overrides that specifically to pin Catppuccin Macchiato,
+      # so the extension has to come along with it.
+      extensions = [ pkgs.vscode-extensions.catppuccin.catppuccin-vsc ];
+
       userSettings = {
+        "workbench.colorTheme" = lib.mkForce "Catppuccin Macchiato";
+
         # Fonts are deliberately NOT set here. Stylix's VS Code target already
         # applies rice.fonts to every font key VS Code has, including the
         # pt-to-px conversion editor.fontSize needs — plan §34 says to use
@@ -46,6 +50,127 @@
         # Wayland-native rather than XWayland; NIXOS_OZONE_WL is exported in
         # the Hyprland env block, and this makes VS Code honour it.
         "window.experimental.useSandbox" = false;
+
+        # Carried over from the pre-Nix Settings Sync profile below. Dropped:
+        # Windows-only paths (msys64, Android SDK), the macOS leetcode path
+        # (rewritten for this $HOME), and workbench.colorTheme, which Stylix
+        # already owns above.
+        "files.autoSave" = "afterDelay";
+        "files.autoSaveDelay" = 1;
+
+        "explorer.confirmDelete" = false;
+        "explorer.confirmPasteNative" = false;
+        "explorer.confirmDragAndDrop" = false;
+
+        "git.autofetch" = true;
+        "git.enableSmartCommit" = true;
+        "git.confirmSync" = false;
+        "git.openRepositoryInParentFolders" = "always";
+
+        "editor.tabSize" = 2;
+        "editor.autoIndentOnPaste" = true;
+        "editor.unicodeHighlight.invisibleCharacters" = false;
+        "editor.accessibilitySupport" = "off";
+
+        "workbench.iconTheme" = "material-icon-theme";
+        "workbench.editor.empty.hint" = "hidden";
+        "workbench.browser.enableChatTools" = true;
+
+        "diffEditor.ignoreTrimWhitespace" = false;
+
+        "typescript.updateImportsOnFileMove.enabled" = "always";
+        "javascript.updateImportsOnFileMove.enabled" = "always";
+        "python.analysis.typeCheckingMode" = "standard";
+
+        "[typescript]" = {
+          "editor.defaultFormatter" = "vscode.typescript-language-features";
+        };
+        "[javascript]" = {
+          "editor.defaultFormatter" = "vscode.typescript-language-features";
+        };
+        "[typescriptreact]" = {
+          "editor.defaultFormatter" = "rvest.vs-code-prettier-eslint";
+        };
+        "[html]" = {
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
+        "[cpp]" = {
+          "editor.defaultFormatter" = "ms-vscode.cpptools";
+        };
+        "[python]" = {
+          "diffEditor.ignoreTrimWhitespace" = false;
+          "editor.defaultColorDecorators" = "never";
+          "editor.formatOnType" = true;
+          "editor.wordBasedSuggestions" = "off";
+        };
+
+        "makefile.configureOnOpen" = true;
+        "biome.suggestInstallingGlobally" = false;
+        "markdown-pdf.format" = "Legal";
+        "livePreview.notifyOnOpenLooseFile" = false;
+        "postman.mcp.notifications.postmanMCP" = false;
+
+        "pros.Enable Analytics" = false;
+        "pros.Show Welcome On Startup" = false;
+
+        "leetcode.workspaceFolder" = "/home/diamondjdev/.leetcode";
+        "leetcode.defaultLanguage" = "python";
+        "leetcode.hint.configWebviewMarkdown" = false;
+        "leetcode.hint.commandShortcut" = false;
+
+        "go.toolsManagement.autoUpdate" = true;
+
+        "security.workspace.trust.untrustedFiles" = "open";
+        "security.promptForLocalFileProtocolHandling" = false;
+
+        "remote.portsAttributes" = {
+          "3001" = {
+            "protocol" = "https";
+          };
+        };
+
+        # GitHub Copilot / Chat
+        "github.copilot.enable" = {
+          "*" = true;
+          "plaintext" = false;
+          "markdown" = false;
+          "scminput" = false;
+          "typescript" = true;
+        };
+        "github.copilot.nextEditSuggestions.enabled" = true;
+        "chat.mcp.gallery.enabled" = true;
+        "chat.agent.maxRequests" = 50;
+        "chat.editing.confirmEditRequestRemoval" = false;
+        "chat.editing.confirmEditRequestRetry" = false;
+        "chat.viewSessions.orientation" = "stacked";
+        "chat.tools.terminal.autoApprove" = {
+          "node" = true;
+          "npm run test" = true;
+          "pnpm" = true;
+        };
+        "chat.tools.urls.autoApprove" = {
+          "https://raw.githubusercontent.com" = {
+            "approveRequest" = false;
+            "approveResponse" = true;
+          };
+        };
+        "chat.instructionsFilesLocations" = {
+          ".github/instructions" = true;
+          ".claude/rules" = true;
+          "~/.copilot/instructions" = true;
+          "~/.claude/rules" = true;
+        };
+
+        # Claude Code extension
+        "claudeCode.selectedModel" = "claude-sonnet-4.5";
+        "claudeCode.disableLoginPrompt" = true;
+        "claudeCode.respectGitIgnore" = false;
+        "claudeCode.preferredLocation" = "panel";
+
+        # Stylix themes VS Code directly; Settings Sync should not touch it.
+        "settingsSync.ignoredExtensions" = [
+          "stylix.stylix"
+        ];
       };
     };
   };
