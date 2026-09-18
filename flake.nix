@@ -1,5 +1,5 @@
 {
-  description = "NixOS Desktop Flake";
+  description = "NixOS Desktop Flake — Hyprland floating rice";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -19,32 +19,40 @@
     {
       nixpkgs,
       home-manager,
-      hyprland,
       stylix,
       ...
     }@inputs:
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+
+      # Centralised rice data (palette, monitor, fonts, dock pins, wallpaper).
+      # Threaded into BOTH option trees so neither NixOS nor Home Manager
+      # modules have to restate a colour or a resolution. See ./settings.nix.
+      rice = import ./settings.nix { inherit pkgs; };
+    in
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        inherit system;
+        specialArgs = { inherit inputs rice; };
         modules = [
-          ./configuration.nix
-          ./hardware-configuration.nix
+          ./hosts/desktop
+
           home-manager.nixosModules.default
           {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.diamondjdev = ./home.nix;
+              extraSpecialArgs = { inherit inputs rice; };
+              users.diamondjdev = ./modules/home;
+              # Move pre-existing unmanaged dotfiles aside rather than
+              # aborting the activation. Needed for the migration off the
+              # hand-written ~/.config/hypr/hyprland.lua.
+              backupFileExtension = "hm-bak";
             };
           }
+
           stylix.nixosModules.stylix
-          ./modules/ssh.nix # Simply comment to disable
-          ./modules/swap.nix
-          # ./modules/hypr.nix
-          # ./modules/rofi.nix
-          # ./modules/dunst.nix
         ];
       };
     };
