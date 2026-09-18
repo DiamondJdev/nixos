@@ -1,5 +1,4 @@
 # Host: desktop (hostname "nixos")
-# Ryzen 7 7800X3D · Radeon RX 7800 XT · 32 GB · single 1920x1080@240 panel
 { pkgs, config, ... }:
 {
   imports = [
@@ -14,7 +13,11 @@
     ../../modules/nixos/nic.nix
     ../../modules/nixos/ssh.nix
     ../../modules/nixos/swap.nix
+    ../../modules/nixos/bt-assistant.nix
   ];
+
+  # App code: ~/Projects/bt-assistant
+  services.bt-assistant.enable = false;
 
   networking.hostName = "nixos";
 
@@ -56,12 +59,42 @@
 
   services.tailscale = {
     enable = true;
-    # Tailscale service starts at boot, but requires manual auth.
-    # After rebuild, run: sudo tailscale up
     openFirewall = true;
   };
-  networking.firewall.allowedUDPPorts = [ 41641 ];
 
+  # Expose the BT assistant webapp on this node's own tailscale IP so any
+  # device in the tailnet can reach it at <tailscale-ip>:8080.
+  systemd.services.tailscale-serve = {
+    description = "Tailscale Serve for BT Assistant";
+    after = [ "tailscaled.service" ];
+    wants = [ "tailscaled.service" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --bg --tcp 8080 localhost:8080";
+      RemainAfterExit = true;
+      Restart = "on-failure";
+      RestartSec = "10s";
+    };
+  };
+
+  networking.firewall = {
+    trustedInterfaces = [ config.services.tailscale.interfaceName ];
+    allowedUDPPorts = [ config.services.tailscale.port ];
+  };
+
+  # The onboard NIC is a Realtek RTL8125 2.5GbE controller. The in-kernel
+  # r8169 driver has a long-documented link-flap bug on this chip: the
+  # link drops and renegotiates (often downshifting to 100Mbps) every
+  # 60-90s, which was the actual cause of SteamVR's "Host Machine
+  # stopped responding" (error 450) disconnects — confirmed via dmesg
+  # timestamps lining up exactly with the SteamVR log's socket-bind
+  # failures. Realtek's own out-of-tree r8125 driver doesn't have this
+  # bug; blacklist r8169 so it binds instead.
+  # boot.blacklistedKernelModules = [ "r8169" ];
+  # boot.extraModulePackages = [ config.boot.kernelPackages.r8125 ];
+  # boot.kernelModules = [ "r8125" ];
 
   ## Locale ################################################################
   time.timeZone = "America/Chicago";
@@ -89,12 +122,6 @@
       "networkmanager"
       "wheel"
     ];
-  };
-
-  ## Misc services #########################################################
-  services.ollama = {
-    enable = false;
-    package = pkgs.ollama-rocm;
   };
 
   environment.systemPackages = with pkgs; [
