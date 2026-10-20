@@ -106,7 +106,10 @@ in
         # comes over the browser WebSocket), so this can be fully isolated
         # from the rest of $HOME. Only the checkout itself is exposed.
         ProtectSystem = "strict";
-        ProtectHome = true;
+        # true makes /home inaccessible, which ReadWritePaths cannot undo, so the
+        # .venv ExecStart was not found (203/EXEC). tmpfs + BindPaths exposes only the checkout.
+        ProtectHome = "tmpfs";
+        BindPaths = [ cfg.projectDir ];
         ReadWritePaths = [ cfg.projectDir ];
         StateDirectory = "bt-assistant";
         StateDirectoryMode = "0700";
