@@ -75,6 +75,8 @@ in
         # $HOME — otherwise first-run/model-change downloads fail closed.
         XDG_CACHE_HOME = "/var/cache/bt-assistant";
         HF_HOME = "/var/cache/bt-assistant/huggingface";
+        # Pipecat sentence-splits LLM text with NLTK punkt_tab; ~/nltk_data is hidden by ProtectHome.
+        NLTK_DATA = "/var/cache/bt-assistant/nltk_data";
 
         # Expose numpy, onnxruntime and friends to systemd
         LD_LIBRARY_PATH = lib.makeLibraryPath [
@@ -95,6 +97,8 @@ in
         # retry. Upgrades are `uv sync` while the service is stopped, same
         # as the project's own deployment docs describe.
         ExecStart = "${cfg.projectDir}/.venv/bin/bt";
+        # NLTK refuses hardlinked files (store optimisation hardlinks them), so copy instead of pointing at the store.
+        ExecStartPre = "${pkgs.coreutils}/bin/cp -rT --no-preserve=mode ${pkgs.nltk-data.punkt-tab} /var/cache/bt-assistant/nltk_data";
         Restart = "on-failure";
         RestartSec = "5s";
         # Whisper/Silero/openwakeword model loading on a cold cache is slow;
