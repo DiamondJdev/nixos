@@ -19,7 +19,14 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       default = "diamondjdev";
-      description = "User the service runs as (needs audio device access).";
+      description = ''
+        User the service runs as. Kept as the checkout's owner (rather than a
+        dedicated system user) so the home-directory checkout stays readable
+        without extra ACLs. The production voice pipeline streams audio over
+        a WebSocket from the browser client — it never touches server-side
+        mic/speaker hardware — so this is purely a file-ownership
+        convenience, not a hardware-access requirement.
+      '';
     };
 
     # secretsFile = lib.mkOption {
@@ -40,6 +47,8 @@ in
       environmentVariables = {
         OLLAMA_FLASH_ATTENTION = "1";
         OLLAMA_KV_CACHE_TYPE = "q8_0";
+        # 4096 overflowed long voice sessions (~2.3k-token prompt); 8192 still leaves ~1.6 GiB VRAM free on the 7800 XT.
+        OLLAMA_CONTEXT_LENGTH = "8192";
       };
     };
 
@@ -49,8 +58,24 @@ in
       wants = [ "ollama.service" ];
       wantedBy = [ "multi-user.target" ];
 
+      # faster-whisper/piper/openwakeword need this to shell out for
+      # non-PCM container/codec handling in the browser audio path.
+      path = with pkgs; [ ffmpeg ];
+
       environment = {
-        UV_CACHE_DIR = "/var/cache/bt-assistant";
+        # Deployment topology, pinned here so it's visible without reading
+        # the gitignored .env in the checkout. Provider/model choice
+        # (BT_OLLAMA_MODEL, OPENAI_API_KEY, BT_WHISPER_*, ...) stays in
+        # .env — load_dotenv(override=False) won't touch what's set here.
+        BT_HOST = "127.0.0.1";
+        BT_DB_PATH = "/var/lib/bt-assistant/bt.sqlite3";
+
+        # Model assets (Whisper, Silero VAD, openwakeword) must land under
+        # a writable cache now that ProtectHome=true hides the rest of
+        # $HOME — otherwise first-run/model-change downloads fail closed.
+        XDG_CACHE_HOME = "/var/cache/bt-assistant";
+        HF_HOME = "/var/cache/bt-assistant/huggingface";
+
         # Expose numpy, onnxruntime and friends to systemd
         LD_LIBRARY_PATH = lib.makeLibraryPath [
           pkgs.stdenv.cc.cc.lib
@@ -64,17 +89,31 @@ in
         Type = "simple";
         User = cfg.user;
         WorkingDirectory = cfg.projectDir;
-        ExecStart = "${pkgs.uv}/bin/uv run bt";
+        # Run the pre-synced .venv directly rather than `uv run bt`: avoids
+        # re-resolving the environment (and depending on network/PyPI
+        # reachability) on every start, including every Restart=on-failure
+        # retry. Upgrades are `uv sync` while the service is stopped, same
+        # as the project's own deployment docs describe.
+        ExecStart = "${cfg.projectDir}/.venv/bin/bt";
         Restart = "on-failure";
         RestartSec = "5s";
+        # Whisper/Silero/openwakeword model loading on a cold cache is slow;
+        # the systemd default (90s) can kill a healthy first start.
+        TimeoutStartSec = "300s";
+        TimeoutStopSec = "45s";
 
-        # Sandboxing: real mic/speaker access needed, so this can't be
-        # fully isolated, but keep it off the rest of the filesystem.
+        # Sandboxing: real mic/speaker access is not needed (voice audio
+        # comes over the browser WebSocket), so this can be fully isolated
+        # from the rest of $HOME. Only the checkout itself is exposed.
         ProtectSystem = "strict";
+        ProtectHome = true;
         ReadWritePaths = [ cfg.projectDir ];
+        StateDirectory = "bt-assistant";
+        StateDirectoryMode = "0700";
         CacheDirectory = "bt-assistant";
-        ProtectHome = "read-only";
+        CacheDirectoryMode = "0700";
         NoNewPrivileges = true;
+        PrivateTmp = true;
       };
     };
   };
