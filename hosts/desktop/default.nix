@@ -14,10 +14,12 @@
     ../../modules/nixos/ssh.nix
     ../../modules/nixos/swap.nix
     ../../modules/nixos/bt-assistant.nix
+    ../../modules/nixos/bt-deploy
   ];
 
-  # App code: ~/Projects/bt-assistant
+  # Production runs releases built by bt-deploy; dev checkout: ~/Projects/bt-assistant
   services.bt-assistant.enable = true;
+  services.bt-deploy.enable = true;
 
   networking.hostName = "nixos";
 

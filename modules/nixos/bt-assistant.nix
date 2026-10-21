@@ -1,6 +1,9 @@
 # BT — voice-native assistant hub. App code lives in a standalone repo
 # (~/Projects/bt-assistant); this module only wires up the pieces that need
 # to be system-level
+#
+# Production runs from /var/lib/bt-deploy/current, a release that bt-deploy
+# built and tested from main. ~/Projects/bt-assistant is the dev checkout only.
 { config, lib, pkgs, ... }:
 
 let
@@ -28,16 +31,6 @@ in
         convenience, not a hardware-access requirement.
       '';
     };
-
-    # secretsFile = lib.mkOption {
-    #   type = lib.types.path;
-    #   default = "/etc/bt-assistant/secrets.env";
-    #   description = ''
-    #     systemd EnvironmentFile holding OPENAI_API_KEY. Created
-    #     out-of-band (root:root, mode 600) — never stored in the nix store
-    #     or the flake, since both are world-readable.
-    #   '';
-    # };
   };
 
   config = lib.mkIf cfg.enable {
@@ -63,10 +56,9 @@ in
       path = with pkgs; [ ffmpeg ];
 
       environment = {
-        # Deployment topology, pinned here so it's visible without reading
-        # the gitignored .env in the checkout. Provider/model choice
-        # (BT_OLLAMA_MODEL, OPENAI_API_KEY, BT_WHISPER_*, ...) stays in
-        # .env — load_dotenv(override=False) won't touch what's set here.
+        # Deployment topology, pinned here. Provider/model choice
+        # (BT_OLLAMA_MODEL, OPENAI_API_KEY, BT_WHISPER_*, ...) comes from
+        # EnvironmentFile below; a release built from git has no .env.
         BT_HOST = "127.0.0.1";
         BT_DB_PATH = "/var/lib/bt-assistant/bt.sqlite3";
 
@@ -106,15 +98,20 @@ in
         TimeoutStartSec = "300s";
         TimeoutStopSec = "45s";
 
+        # Provider settings and secrets: root:root 0600, created by hand, never
+        # in the store. Required: starting without the model settings is worse
+        # than not starting. It overrides `environment`, so keep topology
+        # (BT_HOST, BT_DB_PATH, BT_MEMORY_DIR) out of it.
+        EnvironmentFile = "/etc/bt-assistant/bt.env";
+
         # Sandboxing: real mic/speaker access is not needed (voice audio
-        # comes over the browser WebSocket), so this can be fully isolated
-        # from the rest of $HOME. Only the checkout itself is exposed.
+        # comes over the browser WebSocket), so $HOME stays hidden. The code
+        # under /var/lib/bt-deploy is read-only here (ProtectSystem=strict);
+        # only the state and cache directories below are writable. Don't
+        # bind-mount `current`: it's a symlink, and a bind would pin the
+        # release that was live at boot.
         ProtectSystem = "strict";
-        # true makes /home inaccessible, which ReadWritePaths cannot undo, so the
-        # .venv ExecStart was not found (203/EXEC). tmpfs + BindPaths exposes only the checkout.
         ProtectHome = "tmpfs";
-        BindPaths = [ cfg.projectDir ];
-        ReadWritePaths = [ cfg.projectDir ];
         StateDirectory = "bt-assistant";
         StateDirectoryMode = "0700";
         CacheDirectory = "bt-assistant";
