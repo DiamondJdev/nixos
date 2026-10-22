@@ -1,6 +1,10 @@
 # BT — voice-native assistant hub. App code lives in a standalone repo
 # (~/Projects/bt-assistant); this module only wires up the pieces that need
-# to be system-level
+# to be system-level.
+#
+# That repo is now a monorepo: the Python backend sits in server/ alongside
+# the planned apple/ and editors/ clients, so projectDir is the checkout root
+# and serverDir is the backend within it.
 #
 # Production runs from /var/lib/bt-deploy/current, a release that bt-deploy
 # built and tested from main. ~/Projects/bt-assistant is the dev checkout only.
@@ -8,6 +12,8 @@
 
 let
   cfg = config.services.bt-assistant;
+  # pyproject.toml/uv.lock live here, so this is also where `uv sync` puts .venv.
+  serverDir = "${cfg.projectDir}/server";
 in
 {
   options.services.bt-assistant = {
@@ -16,7 +22,10 @@ in
     projectDir = lib.mkOption {
       type = lib.types.path;
       default = "/home/diamondjdev/Projects/bt-assistant";
-      description = "Path to the bt-assistant application checkout.";
+      description = ''
+        Path to the bt-assistant monorepo checkout (the repository root, not
+        the server/ subdirectory the backend runs from).
+      '';
     };
 
     user = lib.mkOption {
@@ -61,6 +70,11 @@ in
         # EnvironmentFile below; a release built from git has no .env.
         BT_HOST = "127.0.0.1";
         BT_DB_PATH = "/var/lib/bt-assistant/bt.sqlite3";
+        # Also pinned out of the checkout, for the same reason as BT_DB_PATH:
+        # the default ("memory") is resolved against the working directory, so
+        # it would otherwise have followed the backend into server/ and
+        # orphaned the existing notes.
+        BT_MEMORY_DIR = "/var/lib/bt-assistant/memory";
 
         # Model assets (Whisper, Silero VAD, openwakeword) must land under
         # a writable cache now that ProtectHome=true hides the rest of
@@ -82,13 +96,13 @@ in
       serviceConfig = {
         Type = "simple";
         User = cfg.user;
-        WorkingDirectory = cfg.projectDir;
+        WorkingDirectory = serverDir;
         # Run the pre-synced .venv directly rather than `uv run bt`: avoids
         # re-resolving the environment (and depending on network/PyPI
         # reachability) on every start, including every Restart=on-failure
         # retry. Upgrades are `uv sync` while the service is stopped, same
         # as the project's own deployment docs describe.
-        ExecStart = "${cfg.projectDir}/.venv/bin/bt";
+        ExecStart = "${serverDir}/.venv/bin/bt";
         # NLTK refuses hardlinked files (store optimisation hardlinks them), so copy instead of pointing at the store.
         ExecStartPre = "${pkgs.coreutils}/bin/cp -rT --no-preserve=mode ${pkgs.nltk-data.punkt-tab} /var/cache/bt-assistant/nltk_data";
         Restart = "on-failure";
